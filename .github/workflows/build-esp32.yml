@@ -14,13 +14,13 @@ jobs:
 
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
-      with:
-        targets: xtensa-esp32s3-espidf
 
     - name: Install ESP32 toolchain
       run: |
         cargo install espup
-        espup install --targets esp32s3
+        espup install --skip-confirmation --targets esp32s3
+        rustup toolchain install esp
+        rustup target add xtensa-esp32s3-espidf --toolchain esp
 
     - name: Build ESP32-S3 binary
       run: |
