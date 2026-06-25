@@ -1,0 +1,20 @@
+[package]
+name = "sma_test"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+codegen-units = 1
+panic = "abort"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "sma_test"
+path = "src/main.rs"

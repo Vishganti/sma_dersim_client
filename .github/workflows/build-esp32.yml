@@ -1,0 +1,48 @@
+name: Build ESP32-S3 Binary
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: xtensa-esp32s3-espidf
+
+    - name: Install ESP32 toolchain
+      run: |
+        cargo install espup
+        espup install --targets esp32s3
+
+    - name: Build ESP32-S3 binary
+      run: |
+        export PATH="$HOME/.espressif/tools/xtensa-esp32s3-elf/esp-13.2.0_20230426/xtensa-esp32s3-elf/bin:$PATH"
+        cargo +esp build --release --target xtensa-esp32s3-espidf -Z build-std=core,alloc,std,panic_abort
+
+    - name: Check binary
+      run: |
+        ls -lh target/xtensa-esp32s3-espidf/release/sma_test
+        file target/xtensa-esp32s3-espidf/release/sma_test
+
+    - name: Upload binary artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: sma_test-esp32s3
+        path: target/xtensa-esp32s3-espidf/release/sma_test
+        retention-days: 30
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: target/xtensa-esp32s3-espidf/release/sma_test
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

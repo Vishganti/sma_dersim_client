@@ -1,0 +1,10 @@
+[build]
+target = "xtensa-esp32-espidf"
+
+[target.xtensa-esp32-espidf]
+linker = "ldpriv"
+runner = "espflash flash --monitor"
+
+[profile.release]
+opt-level = "z"
+lto = true
